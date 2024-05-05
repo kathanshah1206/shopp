@@ -2,15 +2,15 @@ import mongoose from "mongoose";
 import chalk from "chalk";
 const connectDB = async () => {
   try {
-forconst conn = await mongoose.connect(
-      "mongodb+srv://kathan:kathan@cluster0.gljtc1w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    const conn = await mongoose.connect(
+      "mongodb+srv://kathanshah12062002:kathan@ecomm.xndguem.mongodb.net/?retryWrites=true&w=majority&appName=ecomm",
       {
         // useUnifiedTopology: true,
         // useNewUrlParser: true,
         // useCreateIndex: true,
       }
     );
-    console.log(process.env.MONGO_URI);
+    // console.log(process.env.MONGO_URI);
     console.log(
       chalk.underline.cyan(`MongoDB Connected: ${conn.connection.host}`)
     );
