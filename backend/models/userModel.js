@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import validator from "validator";
-
+import jwt from "jsonwebtoken";
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -32,11 +32,11 @@ const userSchema = mongoose.Schema(
     avatar: {
       public_id: {
         type: String,
-        requiredL: true,
+        required: true,
       },
       url: {
         type: String,
-        requiredL: true,
+        required: true,
       },
     },
     resetPasswordToken: String,
@@ -46,19 +46,27 @@ const userSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+//JWT Token
+userSchema.methods.getJWTToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
+};
+console.log(process.env.JWT_SECRET);
+userSchema.methods.comparePassword = async function comparePassword(
+  enteredPassword
+) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
-// userSchema.methods.matchPassword = async function (enteredPassword) {
-//   return await bcrypt.compare(enteredPassword, this.password);
-// };
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
 
-// userSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) {
-//     next();
-//   }
-
-//   const salt = await bcrypt.genSalt(10);
-//   this.password = await bcrypt.hash(this.password, salt);
-// });
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
 
 const User = mongoose.model("User", userSchema);
 
