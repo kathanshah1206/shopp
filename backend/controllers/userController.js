@@ -49,4 +49,24 @@ const loginUser = catchAsyncError(async (req, res, next) => {
   //   });
   sendToken(user, 200, res);
 });
-export { registerUser, loginUser };
+const logoutUser = catchAsyncError(async (req, res, next) => {
+  res.clearCookie("token", {
+    expires: new Date(0),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    success: true,
+    message: "Logged Out",
+  });
+});
+const forgotPassword = catchAsyncError(async (req, res, next) => {
+  const user = await User.findOne(req.body.email);
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+  const resetToken = user.getResetPasswordToken();
+  await user.save({ validateBeforeSave: false });
+  const resetPasswordurl = `http://localhost:${process.env.PORT}/api/v1/password/reset`;
+});
+
+export { forgotPassword, registerUser, loginUser, logoutUser };

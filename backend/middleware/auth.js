@@ -11,4 +11,15 @@ const isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   req.user = await User.findById(decodedData.id);
   next();
 });
-export { isAuthenticatedUser };
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorHandler(` ${req.user.role} is not allowed to access`, 403)
+      );
+    }
+
+    next();
+  };
+};
+export { isAuthenticatedUser, authorizeRoles };
